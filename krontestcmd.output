@@ -1,0 +1,7 @@
+./bc -g10 -vn1 > test/out/verify-bc-g10.out
+./bfs -g10 -vn1 > test/out/verify-bfs-g10.out
+./cc -g10 -vn1 > test/out/verify-cc-g10.out
+./cc_afforest -g10 -vn1 > test/out/verify-cc_afforest-g10.out
+./pr -g10 -vn1 > test/out/verify-pr-g10.out
+./sssp -g10 -vn1 > test/out/verify-sssp-g10.out
+./tc -g10 -vn1 > test/out/verify-tc-g10.out
