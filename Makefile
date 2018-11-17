@@ -1,9 +1,9 @@
 # See LICENSE.txt for license details.
 
-#CXX = ${RISCV}/bin/riscv64-unknown-elf-g++
-CXX = ${RISCV}/bin/riscv64-unknown-linux-gnu-g++
+#CXX = ${RISCV}/bin/riscv64-unknown-elf-g++ #run on x86 machines
+CXX = ${RISCV}/bin/riscv64-unknown-linux-gnu-g++ #for running on RV64 machines
 
-CXX_FLAGS += -std=c++11 -O3 -Wall
+CXX_FLAGS += -std=c++11 -O3 -Wall -static
 PAR_FLAG = -fopenmp
 
 ifneq (,$(findstring icpc,$(CXX)))
