@@ -8,20 +8,20 @@ function usage
     echo "    verify: if set, verifies the output of the benchmark. Default is off"
 }
 
-if [ $# -eq 0 -o "$1" == "--help" -o "$1" == "-h"]; then
+if [ $# -eq 0 -o "$1" == "--help" -o "$1" == "-h" ]; then
     usage
     exit 3
 fi
 
 bmark_name=$1
 shift
+mkdir -p ~/output
+export OMP_NUM_THREADS=1
+echo "Starting rate $bmark_name run with $OMP_NUM_THREADS threads"
 if [ "$1" == "--verify" ]; then
-    verify=1
+    echo "and verifying output."
+    ./run/${bmark_name}.sh -v > ~/output/out 2>~/output/err
+else
+    ./run/${bmark_name}.sh > ~/output/out 2>~/output/err
 fi
 
-mkdir -p ~/output
-export OMP_NUM_THREADS=$2
-echo "Starting rate $bmark_name run with $OMP_NUM_THREADS threads"
-start_counters
-./run/${bmark_name}.sh > ~/output/out 2>~/output/err
-stop_counters
