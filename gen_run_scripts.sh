@@ -6,7 +6,14 @@ jsonFlag=false
 input_type=test
 verifyFlag=false
 
+#default vals for json
+bootbinary="bbl-vmlinux"
+output="/benchmark/out/"
+root_fs="gapbs.img"
+
+
 workload_file="gapbs.json"
+workload=$(basename $workload_file .json)
 function usage
 {
     echo "usage gen_run_scripts.sh [--json] [-h] --input [test | graph500 | ref] [--verify]"
@@ -38,6 +45,13 @@ done
 mkdir -p run
 if [ "$jsonFlag" = true ]; then
     echo "{" > $workload_file
+    echo "  \"common_bootbinary\" \: ${bootbinary}," > $workload_file
+    echo "  \"benchmark_name\" \: ${workload}," > $workload_file
+    echo "  \"deliver_dir\" \: ${workload}," > $workload_file
+    echo "  \"common_args\" \: []," > $workload_file
+    echo "  \"common_files\" \: [\"gapbs.sh\", \"benchmark/graphs/kron.sg\"]," > $workload_file
+    echo "  \"common_outputs\" \: [\"/benchmark/out\"]," > $workload_file
+    echo "  \"common_rootfs\" \: \"${rootfs}\"," > $workload_file
 fi
 
 while IFS= read -r command; do
@@ -45,23 +59,19 @@ while IFS= read -r command; do
     graph=`echo ${command} | grep -Eo 'benchmark/graphs/\w*\.\w*'`
     output_file="${t_pwd}/`echo $command | grep -Eo "benchmark\/out/.*out"`"
     binary="${bmark}"
-    workload=$(basename $output_file .out)
     echo "workload: ${workload}"
     echo "output_file: ${output_file}"
     echo "graph: ${graph}"
     echo "binary: ${binary}"
     run_script=run/${workload}.sh
     echo '#!/bin/bash' > $run_script
-    if [ "$verifyFlag" = true ]; then
-        echo $command | sed "s/benchmark/\\${t_pwd}\/benchmark/g" | sed "s/^\./\\${t_pwd}/" | sed "s/-n/-vn/g" >> $run_script
-    else
-        echo $command | sed "s/benchmark/\\${t_pwd}\/benchmark/g" | sed "s/^\./\\${t_pwd}/" >> $run_script
-    fi
+    echo $command | sed "s/benchmark/\\${t_pwd}\/benchmark/g" | sed "s/^\./\\${t_pwd}/" | sed "s/-n/\$1 -n/g" >> $run_script
 
     chmod +x $run_script
     cat $run_script
     if [ "$jsonFlag" = true ]; then
-        echo "  {" >> $workload_file
+        echo "  \"workloads\"  : [" >> $workload_file
+        echo "    {" >> $workload_file
         echo "    \"name\": \"${workload}\"," >> $workload_file
         echo "    \"files\": [\"${binary}\", \"${graph}\"]," >> $workload_file
         echo "    \"command\": \"cd /gapbs && ./gapbs.sh ${workload}\"," >> $workload_file
