@@ -50,8 +50,8 @@ then
     echo "  \"benchmark_name\" : \"${workload}\"," >> $workload_file
     echo "  \"deliver_dir\" : \"${workload}\"," >> $workload_file
     echo "  \"common_args\" : []," >> $workload_file
-    echo "  \"common_files\" : [\"gapbs.sh\", \"benchmark/graphs/kron.sg\"]," >> $workload_file
-    echo "  \"common_outputs\" : [\"benchmark/out\"]," >> $workload_file
+    echo "  \"common_files\" : [\"gapbs.sh\"]," >> $workload_file
+    echo "  \"common_outputs\" : [\"/output\"]," >> $workload_file
 #    echo "  \"common_rootfs\" : \"${root_fs}\"," >> $workload_file
     echo "  \"workloads\" : [" >> $workload_file
 fi
