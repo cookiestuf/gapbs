@@ -68,14 +68,14 @@ while IFS= read -r command; do
     echo "binary: ${binary}"
     run_script=run/${workload}.sh
     echo '#!/bin/bash' > $run_script
-    echo $command | sed "s/benchmark/\\${t_pwd}\/benchmark/g" | sed "s/^\./\\${t_pwd}/" | sed "s/-n/\$1 -n/g" >> $run_script
+    echo $command | sed "s/benchmark/\\${t_pwd}\/benchmark/g" | sed "s/^\./\\${t_pwd}/" | sed "s/-n/\$1 -n/g" |sed "s/ >.*//" >> $run_script
 
     chmod +x $run_script
     cat $run_script
     if [ "$jsonFlag" = true ]; then
         echo "    {" >> $workload_file
         echo "      \"name\": \"${workload}\"," >> $workload_file
-        echo "      \"files\": [\"${binary}\", \"${graph}\"]," >> $workload_file
+        echo "      \"files\": [\"${binary}\", \"${run_script}\", \"${graph}\"]," >> $workload_file
         echo "      \"command\": \"cd /gapbs && ./gapbs.sh ${workload}\"," >> $workload_file
         echo "      \"outputs\": [\"${output_file}\"]" >> $workload_file
         echo "    }," >> $workload_file
