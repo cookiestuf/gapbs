@@ -77,7 +77,7 @@ while IFS= read -r command; do
         echo "      \"name\": \"${workload}\"," >> $workload_file
         echo "      \"files\": [\"${binary}\", \"${run_script}\", \"${graph}\"]," >> $workload_file
         echo "      \"command\": \"cd /gapbs && ./gapbs.sh ${workload}\"," >> $workload_file
-        echo "      \"outputs\": [\"${output_file}\"]" >> $workload_file
+        echo "      \"outputs\": []" >> $workload_file
         echo "    }," >> $workload_file
     fi
 done < $command_file
