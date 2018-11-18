@@ -43,21 +43,24 @@ done
 
 
 mkdir -p run
-if [ "$jsonFlag" = true ]; then
+if [ "$jsonFlag" = true ];
+then
     echo "{" > $workload_file
-    echo "  \"common_bootbinary\" \: ${bootbinary}," > $workload_file
-    echo "  \"benchmark_name\" \: ${workload}," > $workload_file
-    echo "  \"deliver_dir\" \: ${workload}," > $workload_file
-    echo "  \"common_args\" \: []," > $workload_file
-    echo "  \"common_files\" \: [\"gapbs.sh\", \"benchmark/graphs/kron.sg\"]," > $workload_file
-    echo "  \"common_outputs\" \: [\"/benchmark/out\"]," > $workload_file
-    echo "  \"common_rootfs\" \: \"${rootfs}\"," > $workload_file
+    echo "  \"common_bootbinary\" : \"${bootbinary}\"," >> $workload_file
+    echo "  \"benchmark_name\" : \"${workload}\"," >> $workload_file
+    echo "  \"deliver_dir\" : \"${workload}\"," >> $workload_file
+    echo "  \"common_args\" : []," >> $workload_file
+    echo "  \"common_files\" : [\"gapbs.sh\", \"benchmark/graphs/kron.sg\"]," >> $workload_file
+    echo "  \"common_outputs\" : [\"benchmark/out\"]," >> $workload_file
+#    echo "  \"common_rootfs\" : \"${root_fs}\"," >> $workload_file
+    echo "  \"workloads\" : [" >> $workload_file
 fi
 
 while IFS= read -r command; do
     bmark=`echo $command | sed 's/\.\/\([a-z]*\).*/\1/'`
     graph=`echo ${command} | grep -Eo 'benchmark/graphs/\w*\.\w*'`
-    output_file="${t_pwd}/`echo $command | grep -Eo "benchmark\/out/.*out"`"
+    output_file="`echo $command | grep -Eo "benchmark\/out/.*out"`"
+    workload=$(basename $output_file .out)
     binary="${bmark}"
     echo "workload: ${workload}"
     echo "output_file: ${output_file}"
@@ -70,17 +73,17 @@ while IFS= read -r command; do
     chmod +x $run_script
     cat $run_script
     if [ "$jsonFlag" = true ]; then
-        echo "  \"workloads\"  : [" >> $workload_file
         echo "    {" >> $workload_file
-        echo "    \"name\": \"${workload}\"," >> $workload_file
-        echo "    \"files\": [\"${binary}\", \"${graph}\"]," >> $workload_file
-        echo "    \"command\": \"cd /gapbs && ./gapbs.sh ${workload}\"," >> $workload_file
-        echo "    \"outputs\": []" >> $workload_file
-        echo "  }," >> $workload_file
+        echo "      \"name\": \"${workload}\"," >> $workload_file
+        echo "      \"files\": [\"${binary}\", \"${graph}\"]," >> $workload_file
+        echo "      \"command\": \"cd /gapbs && ./gapbs.sh ${workload}\"," >> $workload_file
+        echo "      \"outputs\": [\"${output_file}\"]" >> $workload_file
+        echo "    }," >> $workload_file
     fi
 done < $command_file
 if [ "$jsonFlag" = true ]; then
     echo "$(head -n -1 $workload_file)" > $workload_file
-    echo "  }" >> $workload_file
-    echo "]" >> $workload_file
+    echo "    }" >> $workload_file
+    echo "  ]" >> $workload_file
+    echo "}" >> $workload_file
 fi
