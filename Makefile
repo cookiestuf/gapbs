@@ -1,6 +1,9 @@
 # See LICENSE.txt for license details.
 
-CXX_FLAGS += -std=c++11 -O3 -Wall
+#CXX = ${RISCV}/bin/riscv64-unknown-elf-g++ #run on x86 machines
+CXX = ${RISCV}/bin/riscv64-unknown-linux-gnu-g++ #for running on RV64 machines
+
+CXX_FLAGS += -std=c++11 -O3 -Wall -static
 PAR_FLAG = -fopenmp
 
 ifneq (,$(findstring icpc,$(CXX)))
@@ -16,8 +19,8 @@ ifneq ($(SERIAL), 1)
 	CXX_FLAGS += $(PAR_FLAG)
 endif
 
-KERNELS = bc bfs cc cc_sv pr sssp tc
-SUITE = $(KERNELS) converter
+KERNELS = bc bfs cc pr sssp tc
+SUITE = $(KERNELS)
 
 .PHONY: all
 all: $(SUITE)
