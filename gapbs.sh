@@ -18,10 +18,12 @@ shift
 mkdir -p ~/output
 export OMP_NUM_THREADS=1
 echo "Starting rate $bmark_name run with $OMP_NUM_THREADS threads"
+./start_counters
 if [ "$1" == "--verify" ]; then
     echo "and verifying output."
     ./run/${bmark_name}.sh -v > ~/output/out 2>~/output/err
 else
     ./run/${bmark_name}.sh > ~/output/out 2>~/output/err
 fi
+./stop_counters
 
