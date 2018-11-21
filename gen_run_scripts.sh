@@ -5,18 +5,21 @@ t_pwd="/gapbs"
 jsonFlag=false
 input_type=test
 verifyFlag=false
+binariesFlag=false
 
 #default vals for json
 bootbinary="bbl-vmlinux"
 output="/benchmark/out/"
 root_fs="gapbs.img"
 
-
+#more default values
+KRON_ARGS=-g10
+SUITE="bc bfs cc cc_sv pr sssp tc"
 workload_file="gapbs.json"
 workload=$(basename $workload_file .json)
 function usage
 {
-    echo "usage gen_run_scripts.sh [--json] [-h] --input [test | graph500 | ref] [--verify]"
+    echo "usage gen_run_scripts.sh [--binaries] [--json] [-h] --input [test | graph500 | ref] [--verify]"
 }
 
 while test $# -gt 0
@@ -34,15 +37,28 @@ do
              usage
              exit
              ;;
-         --verify)
+         --binaries)
+             binariesFlag=true
+             ;;
+          --verify)
              verifyFlag=true
              ;;
     esac
     shift
 done
 
+if [ "$binariesFlag" = true ];
+then
+    make converter
+    CXX=${RISCV}/bin/riscv64-unknown-linux-gnu-g++ CXX_FLAGS+=--static make
+    mkdir -p overlay/$input_type/benchmark/graphs
+    cp $SUITE overlay/$input_type/
+    ./converter $KRON_ARGS -wb overlay/$input_type/benchmark/graphs/kron.wsg
+    ./converter $KRON_ARGS -b overlay/$input_type/benchmark/graphs/kron.sg
+    ./converter $KRON_ARGS -b overlay/$input_type/benchmark/graphs/kronU.sg
+fi
 
-mkdir -p run
+mkdir -p overlay/$input_type/run
 if [ "$jsonFlag" = true ];
 then
     echo "{" > $workload_file
@@ -62,16 +78,15 @@ while IFS= read -r command; do
     output_file="`echo $command | grep -Eo "benchmark\/out/.*out"`"
     workload=$(basename $output_file .out)
     binary="${bmark}"
-    echo "workload: ${workload}"
-    echo "output_file: ${output_file}"
-    echo "graph: ${graph}"
-    echo "binary: ${binary}"
-    run_script=run/${workload}.sh
+    #echo "workload: ${workload}"
+    #echo "output_file: ${output_file}"
+    #echo "graph: ${graph}"
+    #echo "binary: ${binary}"
+    run_script=overlay/$input_type/run/${workload}.sh
     echo '#!/bin/bash' > $run_script
     echo $command | sed "s/benchmark/\\${t_pwd}\/benchmark/g" | sed "s/^\./\\${t_pwd}/" | sed "s/-n/\$1 -n/g" |sed "s/ >.*//" >> $run_script
 
     chmod +x $run_script
-    cat $run_script
     if [ "$jsonFlag" = true ]; then
         echo "    {" >> $workload_file
         echo "      \"name\": \"${workload}\"," >> $workload_file
