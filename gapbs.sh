@@ -1,5 +1,4 @@
 #!/bin/bash
-#TODO: add function usage informations. add verify tag
 verify=0
 function usage
 {
@@ -16,7 +15,7 @@ fi
 bmark_name=$1
 shift
 mkdir -p ~/output
-export OMP_NUM_THREADS=1
+export OMP_NUM_THREADS=`grep -o 'hart' /proc/cpuinfo | wc -l`
 echo "Starting rate $bmark_name run with $OMP_NUM_THREADS threads"
 ./start_counters
 if [ "$1" == "--verify" ]; then
@@ -26,4 +25,6 @@ else
     ./run/${bmark_name}.sh > ~/output/out 2>~/output/err
 fi
 ./stop_counters
-
+cd ~/hpm_data
+head -2 *0*
+tail -n2 *0*
