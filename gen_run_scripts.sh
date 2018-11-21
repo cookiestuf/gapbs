@@ -47,7 +47,7 @@ do
     shift
 done
 
-if [ "$binariesFlag" = true ];
+if [ "$binariesFlag" = true ] && [ ! -d "overlay/$input_type" ];
 then
     make converter
     CXX=${RISCV}/bin/riscv64-unknown-linux-gnu-g++ CXX_FLAGS+=--static make
@@ -68,7 +68,6 @@ then
     echo "  \"common_args\" : []," >> $workload_file
     echo "  \"common_files\" : [\"gapbs.sh\"]," >> $workload_file
     echo "  \"common_outputs\" : [\"/output\"]," >> $workload_file
-#    echo "  \"common_rootfs\" : \"${root_fs}\"," >> $workload_file
     echo "  \"workloads\" : [" >> $workload_file
 fi
 
@@ -78,11 +77,8 @@ while IFS= read -r command; do
     output_file="`echo $command | grep -Eo "benchmark\/out/.*out"`"
     workload=$(basename $output_file .out)
     binary="${bmark}"
-    #echo "workload: ${workload}"
-    #echo "output_file: ${output_file}"
-    #echo "graph: ${graph}"
-    #echo "binary: ${binary}"
     run_script=overlay/$input_type/run/${workload}.sh
+    run_script_no_overlay=run/${workload}.sh
     echo '#!/bin/bash' > $run_script
     echo $command | sed "s/benchmark/\\${t_pwd}\/benchmark/g" | sed "s/^\./\\${t_pwd}/" | sed "s/-n/\$1 -n/g" |sed "s/ >.*//" >> $run_script
 
@@ -90,7 +86,7 @@ while IFS= read -r command; do
     if [ "$jsonFlag" = true ]; then
         echo "    {" >> $workload_file
         echo "      \"name\": \"${workload}\"," >> $workload_file
-        echo "      \"files\": [\"${binary}\", \"${run_script}\", \"${graph}\"]," >> $workload_file
+        echo "      \"files\": [\"${binary}\", \"${run_script_no_overlay}\", \"${graph}\"]," >> $workload_file
         echo "      \"command\": \"cd /gapbs && ./gapbs.sh ${workload}\"," >> $workload_file
         echo "      \"outputs\": []" >> $workload_file
         echo "    }," >> $workload_file
