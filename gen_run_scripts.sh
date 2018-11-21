@@ -14,7 +14,7 @@ root_fs="gapbs.img"
 
 #more default values
 KRON_ARGS=-g10
-SUITE="bc bfs cc cc_sv pr sssp tc"
+SUITE="bc bfs cc cc_sv pr sssp tc gapbs.sh"
 workload_file="gapbs.json"
 workload=$(basename $workload_file .json)
 function usage
