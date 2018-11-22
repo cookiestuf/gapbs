@@ -46,6 +46,10 @@ do
     esac
     shift
 done
+if [ "$input_type" = graph500 ];
+then
+    $KRON_ARGS=-g20
+fi
 
 if [ "$binariesFlag" = true ] && [ ! -d "overlay/$input_type" ];
 then
