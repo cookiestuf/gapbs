@@ -63,7 +63,7 @@ if [ "$jsonFlag" = true ];
 then
     echo "{" > $workload_file
     echo "  \"common_bootbinary\" : \"${bootbinary}\"," >> $workload_file
-    echo "  \"benchmark_name\" : \"${workload}\"," >> $workload_file
+    echo "  \"benchmark_name\" : \"gapbs-kron\"," >> $workload_file
     echo "  \"deliver_dir\" : \"${workload}\"," >> $workload_file
     echo "  \"common_args\" : []," >> $workload_file
     echo "  \"common_files\" : [\"gapbs.sh\"]," >> $workload_file
